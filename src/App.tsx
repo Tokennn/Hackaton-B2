@@ -10,7 +10,6 @@ interface TransportOption {
   name: string;
   icon: React.ReactNode;
   co2: number;
-  time: number;
   color: string;
   points: number;
 }
@@ -29,13 +28,13 @@ interface Level {
 }
 
 const transportOptions: TransportOption[] = [
-  { id: 'bike', name: 'Vélo', icon: <Bike size={32} />, co2: 0, time: 45, color: '#22c55e', points: 100 },
-  { id: 'bus', name: 'Bus', icon: <Bus size={32} />, co2: 68, time: 30, color: '#3b82f6', points: 50 },
-  { id: 'train', name: 'Train/Métro', icon: <Train size={32} />, co2: 14, time: 25, color: '#6366f1', points: 75 },
-  { id: 'car', name: 'Voiture', icon: <Car size={32} />, co2: 120, time: 20, color: '#ef4444', points: -50 },
+  { id: 'bike', name: 'Vélo', icon: <Bike size={32} />, co2: 0, color: '#22c55e', points: 100 },
+  { id: 'bus', name: 'Bus', icon: <Bus size={32} />, co2: 68, color: '#3b82f6', points: 50 },
+  { id: 'train', name: 'Train/Métro', icon: <Train size={32} />, co2: 14, color: '#6366f1', points: 75 },
+  { id: 'car', name: 'Voiture', icon: <Car size={32} />, co2: 120, color: '#ef4444', points: -50 },
 ];
 
-// 15 niveaux, dont 5 déjà existants et 10 niveaux supplémentaires.
+// 15 niveaux : 5 existants + 10 niveaux supplémentaires
 const levels: Level[] = [
   {
     id: 1,
@@ -94,7 +93,6 @@ const levels: Level[] = [
     distance: 3.8,
     difficulty: "Facile"
   },
-  // Niveaux supplémentaires :
   {
     id: 6,
     name: "Trajet Périphérique",
@@ -216,6 +214,19 @@ const levels: Level[] = [
   }
 ];
 
+// Fonction de calcul du temps de trajet (en minutes) en fonction du mode et de la distance
+const getTransportTime = (transportId: string, distance: number) => {
+  const speeds: { [key: string]: number } = {
+    bike: 15,   // km/h
+    bus: 40,
+    train: 80,
+    car: 60,
+  };
+  const speed = speeds[transportId];
+  if (!speed) return 0;
+  return Math.ceil((distance / speed) * 60); // conversion en minutes
+};
+
 function AnimatedMarker({ position, color }: { position: [number, number]; color: string }) {
   const map = useMap();
   useEffect(() => {
@@ -236,9 +247,7 @@ function AnimatedMarker({ position, color }: { position: [number, number]; color
 // Variants pour l'animation des box de l'écran d'intro
 const containerVariants = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.4 },
-  },
+  visible: { transition: { staggerChildren: 0.4 } },
 };
 
 const boxVariants = {
@@ -638,7 +647,9 @@ function App() {
                       <div className="flex flex-col items-center">
                         <div className="mb-2">{option.icon}</div>
                         <span className="font-medium text-gray-800">{option.name}</span>
-                        <span className="text-sm text-gray-500">{option.time} min</span>
+                        <span className="text-sm text-gray-500">
+                          {getTransportTime(option.id, currentLevel.distance)} min
+                        </span>
                       </div>
                     </button>
                   ))}
