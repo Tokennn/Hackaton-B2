@@ -29,7 +29,7 @@ interface Level {
 const transportOptions: TransportOption[] = [
   { id: 'bike', name: 'Vélo', icon: <Bike size={32} />, co2: 0, time: 45, color: '#22c55e', points: 100 },
   { id: 'bus', name: 'Bus', icon: <Bus size={32} />, co2: 68, time: 30, color: '#3b82f6', points: 50 },
-  { id: 'train', name: 'Train', icon: <Train size={32} />, co2: 14, time: 25, color: '#6366f1', points: 75 },
+  { id: 'train', name: 'Train/Métro', icon: <Train size={32} />, co2: 14, time: 25, color: '#6366f1', points: 75 },
   { id: 'car', name: 'Voiture', icon: <Car size={32} />, co2: 120, time: 20, color: '#ef4444', points: -50 },
 ];
 
