@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.leaflet-container {
+  z-index: 1;
+}
+
+.custom-div-icon {
+  background: none;
+  border: none;
+}
