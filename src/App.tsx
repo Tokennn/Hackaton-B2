@@ -69,6 +69,28 @@ const levels: Level[] = [
     endName: "Notre-Dame",
     distance: 3.8,
     difficulty: "Facile"
+  },
+  {
+    id: 4,
+    name: "Trajet Urbain",
+    description: "Montpellier → Bordeaux",
+    startPoint: [43.611111, 3.871837],
+    endPoint: [44.841080, -0.580948],
+    startName: "Montpellier",
+    endName: "Bordeaux",
+    distance: 3.8,
+    difficulty: "Moyen"
+  },
+  {
+    id: 4,
+    name: "Trajet Urbain",
+    description: "Bellcour → Bordeaux",
+    startPoint: [45.757523, 4.832542],
+    endPoint: [44.841080, -0.580948],
+    startName: "Bellcour",
+    endName: "Bordeaux",
+    distance: 3.8,
+    difficulty: "Facile"
   }
 ];
 
