@@ -3,6 +3,7 @@ import { Bike, Bus, Car, Train, RotateCcw, User, Trophy } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { motion } from "framer-motion";
 
 interface TransportOption {
   id: string;
@@ -32,6 +33,8 @@ const transportOptions: TransportOption[] = [
   { id: 'train', name: 'Train/Métro', icon: <Train size={32} />, co2: 14, time: 25, color: '#6366f1', points: 75 },
   { id: 'car', name: 'Voiture', icon: <Car size={32} />, co2: 120, time: 20, color: '#ef4444', points: -50 },
 ];
+
+
 
 const levels: Level[] = [
   {
@@ -163,7 +166,14 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
         <header className="flex justify-between items-center mb-12">
-          <h1 className="text-4xl font-bold text-green-800">Movesmart 😉</h1>
+        <motion.h1
+  className="text-4xl font-bold text-green-800"
+  initial={{ opacity: 1, y: -20 }}
+  animate={{ y: [10, -15, 10] }} // Animation de la position verticale uniquement
+  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+>
+  Movesmart 😉
+</motion.h1>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setShowProfile(!showProfile)}
