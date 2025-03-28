@@ -163,7 +163,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
         <header className="flex justify-between items-center mb-12">
-          <h1 className="text-4xl font-bold text-green-800">Éco-Mobilité Challenge</h1>
+          <h1 className="text-4xl font-bold text-green-800">Movesmart 😉</h1>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setShowProfile(!showProfile)}
@@ -181,7 +181,7 @@ function App() {
         {showProfile ? (
           <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 mb-8">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">Profil Écologique</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">Votre Profil :</h2>
               <button
                 onClick={() => setShowProfile(false)}
                 className="text-gray-500 hover:text-gray-700"
