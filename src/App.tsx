@@ -82,7 +82,7 @@ const levels: Level[] = [
     difficulty: "Moyen"
   },
   {
-    id: 4,
+    id: 5,
     name: "Trajet Urbain",
     description: "Bellcour → Bordeaux",
     startPoint: [45.757523, 4.832542],
@@ -379,7 +379,10 @@ function App() {
         )}
 
         <footer className="text-center text-gray-600 text-sm">
-          <p>Faites les bons choix pour l'environnement !</p>
+          <p>Faites les bons choix pour l'environnement ! </p>
+          <p>
+          Les transports doux désignent les modes de déplacement respectueux de l’environnement, tels que la marche, le vélo, la trottinette ou encore les transports en commun. Ces alternatives à la voiture individuelle contribuent à réduire la pollution, limiter les embouteillages et améliorer la qualité de vie en ville. Elles sont essentielles pour un avenir plus durable et une mobilité plus accessible à tous. Opter pour les transports doux, c’est choisir un mode de vie plus sain et plus respectueux de notre planète.
+          </p>
         </footer>
       </div>
     </div>
