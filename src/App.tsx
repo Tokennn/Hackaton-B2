@@ -555,9 +555,9 @@ function App() {
                     <div>
                       <h2 className="text-2xl font-semibold text-gray-800">{currentLevel.name}</h2>
                       <p className="text-gray-600">Difficulté: {currentLevel.difficulty}</p>
-                      <p className="text-sm text-gray-500 mt-2">
+                      {/* <p className="text-sm text-gray-500 mt-2">
                         Départ: {currentLevel.startName} / Arrivée: {currentLevel.endName}
-                      </p>
+                      </p> */}
                     </div>
                     <div className="flex gap-2">
                       <button
