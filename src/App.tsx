@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Bike, Bus, Car, Train, RotateCcw, User, Trophy } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -25,7 +25,6 @@ interface Level {
   endName: string;
   distance: number;
   difficulty: 'Facile' | 'Moyen' | 'Difficile';
-  // Propriété pour définir quel transport est recommandé pour ce niveau
   recommendedTransport?: string;
 }
 
@@ -58,7 +57,7 @@ const levels: Level[] = [
     endName: "Gare Part-Dieu",
     distance: 465,
     difficulty: "Moyen",
-    recommendedTransport: "car" // Pour ce long trajet, l'utilisation de la voiture est plus logique
+    recommendedTransport: "car"
   },
   {
     id: 3,
@@ -81,7 +80,7 @@ const levels: Level[] = [
     endName: "Bordeaux",
     distance: 3.8,
     difficulty: "Moyen",
-    recommendedTransport: "car" // Ici, la voiture est aussi le choix recommandé
+    recommendedTransport: "car"
   },
   {
     id: 5,
@@ -115,7 +114,7 @@ function AnimatedMarker({ position, color }: { position: [number, number]; color
   );
 }
 
-// Variants pour l'animation des box
+// Variants pour l'animation des box dans l'écran d'intro
 const containerVariants = {
   hidden: {},
   visible: {
@@ -166,7 +165,7 @@ const IntroScreen = ({ onFinish }: { onFinish: () => void }) => {
         >
           <h2 className="text-xl font-bold mb-2">Moins de Pollution</h2>
           <p className="text-gray-600">
-            En optant pour des modes de transport doux, vous réduisez vos émissions de CO2 et contribuez à un air plus pur.
+            Réduisez vos émissions de CO2 et contribuez à un air plus pur.
           </p>
         </motion.div>
         <motion.div 
@@ -175,7 +174,7 @@ const IntroScreen = ({ onFinish }: { onFinish: () => void }) => {
         >
           <h2 className="text-xl font-bold mb-2">Santé et Bien-être</h2>
           <p className="text-gray-600">
-            Se déplacer à pied ou à vélo améliore votre santé physique et mentale tout en diminuant le stress urbain.
+            Améliorez votre santé physique et mentale en vous déplaçant à pied ou à vélo.
           </p>
         </motion.div>
         <motion.div 
@@ -184,7 +183,7 @@ const IntroScreen = ({ onFinish }: { onFinish: () => void }) => {
         >
           <h2 className="text-xl font-bold mb-2">Avenir Durable</h2>
           <p className="text-gray-600">
-            Adopter des transports doux, c'est investir dans un futur plus respectueux de notre planète et de ses ressources.
+            Investissez dans un futur respectueux de notre planète et de ses ressources.
           </p>
         </motion.div>
         <motion.div 
@@ -193,7 +192,7 @@ const IntroScreen = ({ onFinish }: { onFinish: () => void }) => {
         >
           <h2 className="text-xl font-bold mb-2">But du Jeu</h2>
           <p className="text-gray-600">
-            Optimisez vos déplacements en choisissant le mode de transport le plus adapté pour améliorer votre score éco et avancer dans le jeu.
+            Optimisez vos déplacements pour améliorer votre score éco et progresser.
           </p>
         </motion.div>
       </motion.div>
@@ -222,8 +221,25 @@ function App() {
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);
   const [routeCoordinates, setRouteCoordinates] = useState<[number, number][]>([]);
 
+  // Références pour stocker les id d'animation et de timeout
+  const animationFrameRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+
+  // Fonction d'annulation des animations en cours
+  const cancelAnimation = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+  };
+
   // Récupération de la route réelle via OSRM lors du changement de niveau
   useEffect(() => {
+    // Réinitialise le marqueur au départ à chaque changement de niveau
     setMarkerPosition(currentLevel.startPoint);
     const getRoute = async () => {
       try {
@@ -247,13 +263,14 @@ function App() {
   const animateRoute = (coords: [number, number][], index: number = 0) => {
     if (index < coords.length) {
       setMarkerPosition(coords[index]);
-      setTimeout(() => {
+      timeoutRef.current = window.setTimeout(() => {
         animateRoute(coords, index + 1);
       }, 50);
     }
   };
 
   const startAnimation = () => {
+    cancelAnimation();
     if (routeCoordinates.length > 0) {
       animateRoute(routeCoordinates);
     } else {
@@ -264,14 +281,22 @@ function App() {
           const lng = currentLevel.startPoint[1] + (currentLevel.endPoint[1] - currentLevel.startPoint[1]) * progress;
           setMarkerPosition([lat, lng]);
           setAnimationProgress(progress);
-          requestAnimationFrame(() => animate(progress + 0.005));
+          animationFrameRef.current = requestAnimationFrame(() => animate(progress + 0.005));
         }
       };
       animate(0);
     }
   };
 
+  // Lorsqu'un transport est sélectionné, on annule toute animation en cours, on réinitialise et on démarre le nouveau trajet
   const handleTransportSelect = (id: string) => {
+    if (selectedTransport && selectedTransport !== id) {
+      cancelAnimation();
+      // Réinitialisation du trajet
+      setMarkerPosition(currentLevel.startPoint);
+      setAnimationProgress(0);
+      setShowResult(false);
+    }
     setSelectedTransport(id);
     setShowResult(true);
     startAnimation();
@@ -280,7 +305,6 @@ function App() {
     if (option) {
       const newScore = ecoScore + option.points;
       setEcoScore(newScore);
-      
       if (!completedLevels.includes(currentLevel.id)) {
         setCompletedLevels([...completedLevels, currentLevel.id]);
       }
@@ -288,6 +312,7 @@ function App() {
   };
 
   const handleRestart = () => {
+    cancelAnimation();
     setSelectedTransport(null);
     setShowResult(false);
     setMarkerPosition(currentLevel.startPoint);
@@ -295,13 +320,13 @@ function App() {
   };
 
   const handleNextLevel = () => {
+    cancelAnimation();
     const currentIndex = levels.findIndex(l => l.id === currentLevel.id);
     const nextIndex = (currentIndex + 1) % levels.length;
     setCurrentLevel(levels[nextIndex]);
     handleRestart();
   };
 
-  // Vérifie le bon choix en fonction du niveau actuel.
   const isGoodChoice = (id: string) => {
     if (currentLevel.recommendedTransport) {
       return id === currentLevel.recommendedTransport;
@@ -413,6 +438,9 @@ function App() {
                     <div>
                       <h2 className="text-2xl font-semibold text-gray-800">{currentLevel.name}</h2>
                       <p className="text-gray-600">Difficulté: {currentLevel.difficulty}</p>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Départ: {currentLevel.startName} / Arrivée: {currentLevel.endName}
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -451,6 +479,23 @@ function App() {
                           <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                          />
+                          {/* Marqueurs permanents pour départ et arrivée */}
+                          <Marker
+                            position={currentLevel.startPoint}
+                            icon={L.divIcon({
+                              className: 'start-marker',
+                              html: `<div style="background-color: blue; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>`,
+                              iconSize: [12, 12],
+                            })}
+                          />
+                          <Marker
+                            position={currentLevel.endPoint}
+                            icon={L.divIcon({
+                              className: 'end-marker',
+                              html: `<div style="background-color: red; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>`,
+                              iconSize: [12, 12],
+                            })}
                           />
                           {selectedTransport && (
                             <>
