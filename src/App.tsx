@@ -35,6 +35,7 @@ const transportOptions: TransportOption[] = [
   { id: 'car', name: 'Voiture', icon: <Car size={32} />, co2: 120, time: 20, color: '#ef4444', points: -50 },
 ];
 
+// 15 niveaux, dont 5 déjà existants et 10 niveaux supplémentaires.
 const levels: Level[] = [
   {
     id: 1,
@@ -92,16 +93,134 @@ const levels: Level[] = [
     endName: "Bordeaux",
     distance: 3.8,
     difficulty: "Facile"
+  },
+  // Niveaux supplémentaires :
+  {
+    id: 6,
+    name: "Trajet Périphérique",
+    description: "La Défense → Nation",
+    startPoint: [48.892, 2.237],
+    endPoint: [48.848, 2.395],
+    startName: "La Défense",
+    endName: "Nation",
+    distance: 8,
+    difficulty: "Moyen",
+    recommendedTransport: "bus"
+  },
+  {
+    id: 7,
+    name: "Trajet Long",
+    description: "Paris → Marseille",
+    startPoint: [48.8566, 2.3522],
+    endPoint: [43.2965, 5.3698],
+    startName: "Paris",
+    endName: "Marseille",
+    distance: 775,
+    difficulty: "Difficile",
+    recommendedTransport: "car"
+  },
+  {
+    id: 8,
+    name: "Trajet Rural",
+    description: "Chartres → Orléans",
+    startPoint: [48.4469, 1.4890],
+    endPoint: [47.9025, 1.9093],
+    startName: "Chartres",
+    endName: "Orléans",
+    distance: 90,
+    difficulty: "Moyen",
+    recommendedTransport: "train"
+  },
+  {
+    id: 9,
+    name: "Trajet de Campagne",
+    description: "Rambouillet → Versailles",
+    startPoint: [48.6459, 1.8341],
+    endPoint: [48.8049, 2.1204],
+    startName: "Rambouillet",
+    endName: "Versailles",
+    distance: 25,
+    difficulty: "Facile"
+  },
+  {
+    id: 10,
+    name: "Trajet Express",
+    description: "Nanterre → Saint-Denis",
+    startPoint: [48.892, 2.198],
+    endPoint: [48.936, 2.357],
+    startName: "Nanterre",
+    endName: "Saint-Denis",
+    distance: 15,
+    difficulty: "Moyen",
+    recommendedTransport: "train"
+  },
+  {
+    id: 11,
+    name: "Trajet International",
+    description: "Calais → Lille",
+    startPoint: [50.9513, 1.8587],
+    endPoint: [50.6292, 3.0573],
+    startName: "Calais",
+    endName: "Lille",
+    distance: 100,
+    difficulty: "Moyen",
+    recommendedTransport: "train"
+  },
+  {
+    id: 12,
+    name: "Trajet Citadin",
+    description: "Strasbourg → Mulhouse",
+    startPoint: [48.5734, 7.7521],
+    endPoint: [47.7508, 7.3359],
+    startName: "Strasbourg",
+    endName: "Mulhouse",
+    distance: 100,
+    difficulty: "Moyen",
+    recommendedTransport: "train"
+  },
+  {
+    id: 13,
+    name: "Trajet Pittoresque",
+    description: "Annecy → Chamonix",
+    startPoint: [45.8992, 6.1294],
+    endPoint: [45.9237, 6.8694],
+    startName: "Annecy",
+    endName: "Chamonix",
+    distance: 70,
+    difficulty: "Difficile",
+    recommendedTransport: "train"
+  },
+  {
+    id: 14,
+    name: "Trajet de Nuit",
+    description: "Paris → Disneyland Paris",
+    startPoint: [48.8566, 2.3522],
+    endPoint: [48.867, 2.783],
+    startName: "Paris",
+    endName: "Disneyland Paris",
+    distance: 40,
+    difficulty: "Facile",
+    recommendedTransport: "bus"
+  },
+  {
+    id: 15,
+    name: "Trajet Méditerranéen",
+    description: "Nice → Cannes",
+    startPoint: [43.7102, 7.2620],
+    endPoint: [43.5528, 7.0174],
+    startName: "Nice",
+    endName: "Cannes",
+    distance: 33,
+    difficulty: "Facile",
+    recommendedTransport: "bus"
   }
 ];
 
 function AnimatedMarker({ position, color }: { position: [number, number]; color: string }) {
   const map = useMap();
-  
   useEffect(() => {
     map.setView(position, map.getZoom());
   }, [position, map]);
-
   return (
     <Marker
       position={position}
@@ -114,13 +233,11 @@ function AnimatedMarker({ position, color }: { position: [number, number]; color
   );
 }
 
-// Variants pour l'animation des box dans l'écran d'intro
+// Variants pour l'animation des box de l'écran d'intro
 const containerVariants = {
   hidden: {},
   visible: {
-    transition: {
-      staggerChildren: 0.4,
-    },
+    transition: { staggerChildren: 0.4 },
   },
 };
 
@@ -129,15 +246,12 @@ const boxVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-// Écran d'introduction avec titre et quatre box explicatives
+// Écran d'introduction avec titre et 4 box explicatives
 const IntroScreen = ({ onFinish }: { onFinish: () => void }) => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      onFinish();
-    }, 8000); // Disparition automatique après 8 secondes
+    const timer = setTimeout(() => onFinish(), 8000);
     return () => clearTimeout(timer);
   }, [onFinish]);
-
   return (
     <motion.div 
       className="fixed inset-0 z-50 bg-gradient-to-br from-green-50 to-blue-50 flex flex-col items-center justify-center p-4"
@@ -220,12 +334,10 @@ function App() {
   const [ecoScore, setEcoScore] = useState(1000);
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);
   const [routeCoordinates, setRouteCoordinates] = useState<[number, number][]>([]);
-
-  // Références pour stocker les id d'animation et de timeout
+  
   const animationFrameRef = useRef<number | null>(null);
   const timeoutRef = useRef<number | null>(null);
 
-  // Fonction d'annulation des animations en cours
   const cancelAnimation = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -237,9 +349,7 @@ function App() {
     }
   };
 
-  // Récupération de la route réelle via OSRM lors du changement de niveau
   useEffect(() => {
-    // Réinitialise le marqueur au départ à chaque changement de niveau
     setMarkerPosition(currentLevel.startPoint);
     const getRoute = async () => {
       try {
@@ -288,11 +398,9 @@ function App() {
     }
   };
 
-  // Lorsqu'un transport est sélectionné, on annule toute animation en cours, on réinitialise et on démarre le nouveau trajet
   const handleTransportSelect = (id: string) => {
     if (selectedTransport && selectedTransport !== id) {
       cancelAnimation();
-      // Réinitialisation du trajet
       setMarkerPosition(currentLevel.startPoint);
       setAnimationProgress(0);
       setShowResult(false);
